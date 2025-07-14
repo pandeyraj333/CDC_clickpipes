@@ -54,10 +54,10 @@ SELECT
     temperature,
     humidity,
     weather_description,
-    toTimeZone(toDateTime(timestamp), 'Asia/Kolkata') AS ist_time
+    toTimeZone(parseDateTimeBestEffort(timestamp), 'Asia/Kolkata') AS ist_time
 FROM live_weather_db_weather_data
 WHERE city = 'Mumbai'
-ORDER BY timestamp DESC
+ORDER BY parseDateTimeBestEffort(timestamp) DESC
 LIMIT 1
 """
 
