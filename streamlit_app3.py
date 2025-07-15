@@ -35,7 +35,7 @@ SELECT
     maxMerge(max_temperature_state) AS max_temp
 FROM trend_table
 GROUP BY city, StartHour
-ORDER BY StartHour;
+ORDER BY StartHour
 """
 
 result = client.query(query_mv)
