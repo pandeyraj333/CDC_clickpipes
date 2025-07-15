@@ -42,7 +42,7 @@ result = client.query(query_mv)
 df_mv = pd.DataFrame(result.result_rows, columns=result.column_names)
 
 if not df_mv.empty:
-        df_mv = df_mv.sort_values("StartHour")
+    df_mv = df_mv.sort_values("StartHour")
     st.line_chart(df_mv.set_index("StartHour")[["avg_temp", "min_temp", "max_temp"]])
     with st.expander("📄 View Aggregated Data"):
         st.dataframe(df_mv)
