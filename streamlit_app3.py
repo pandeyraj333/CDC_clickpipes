@@ -27,11 +27,15 @@ start_date = st.date_input("Start date", datetime.date.today() - datetime.timede
 end_date = st.date_input("End date", datetime.date.today())
 
 query_mv = f"""
-SELECT *
-FROM temp_trend_mv
-WHERE city = 'Mumbai'
-  AND interval_time_ist BETWEEN toDateTime('{start_date}') AND toDateTime('{end_date + datetime.timedelta(days=1)}')
-ORDER BY interval_time_ist
+SELECT
+    city,
+    StartHour,
+    avgMerge(avg_temperature_state) AS avg_temp,
+    minMerge(min_temperature_state) AS min_temp,
+    maxMerge(max_temperature_state) AS max_temp
+FROM trend_table
+GROUP BY city, StartHour
+ORDER BY StartHour;
 """
 
 result = client.query(query_mv)
