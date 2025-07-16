@@ -30,7 +30,7 @@ query_mv = f"""
 SELECT
     city,
     StartHour,
-    avgMerge(avg_temperature_state) AS avg_temp,
+    round(avgMerge(avg_temperature_state)) AS avg_temp,
     minMerge(min_temperature_state) AS min_temp,
     maxMerge(max_temperature_state) AS max_temp
 FROM trend_table
