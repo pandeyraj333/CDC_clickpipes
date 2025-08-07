@@ -7,7 +7,7 @@ import datetime
 # ⏱️ Auto-refresh every 2 minutes
 st.query_params.update(update=int(time.time() // 120))
 
-st.title("🌤️ Mumbai Weather Dashboard (Live, IST)")
+st.title("🌤️ Weather Dashboard (Live, IST)")
 st.caption("Powered by MySQL → ClickPipes → ClickHouse → Streamlit")
 
 # 🔐 Secure credentials
@@ -18,6 +18,20 @@ client = clickhouse_connect.get_client(
     secure=True,
     database='MySQL-CDC'  # Adjust if your DB name differs
 )
+
+query_city = f"""
+SELECT
+    city,
+FROM trend_table_del
+GROUP BY city
+"""
+
+result = client.query(query_mv)
+df_city = pd.DataFrame(result.result_rows, columns=result.column_names)
+unique_values = df_city['city'].unique()
+city = st.selectbox("Choose a value:", unique_values)
+
+st.write(f"You selected: {city}")
 
 # 🔹 Visual 1: Hourly Temperature Trends
 st.subheader("📈 Temperature Trends (Hourly)")
@@ -34,6 +48,7 @@ SELECT
     minMerge(min_temperature_state) AS min_temp,
     maxMerge(max_temperature_state) AS max_temp
 FROM trend_table
+WHERE city = '{city}'
 GROUP BY city, StartHour
 ORDER BY StartHour
 """
@@ -52,7 +67,7 @@ else:
 # 🔹 Visual 2: Latest Snapshot
 st.subheader("🌡️ Latest Live Weather Snapshot")
 
-query_latest = """
+query_latest = f"""
 SELECT
     city,
     temperature,
@@ -60,7 +75,7 @@ SELECT
     weather_description,
     toTimeZone(parseDateTimeBestEffort(timestamp), 'Asia/Kolkata') AS ist_time
 FROM live_weather_db_weather_data
-WHERE city = 'Mumbai'
+WHERE city = '{city}'
 ORDER BY parseDateTimeBestEffort(timestamp) DESC
 LIMIT 1
 """
