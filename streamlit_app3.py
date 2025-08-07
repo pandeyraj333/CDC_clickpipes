@@ -37,8 +37,8 @@ st.write(f"You selected: {city}")
 st.subheader("📈 Temperature Trends (Hourly)")
 
 # Optional date range filter (can be removed if not needed)
-start_date = st.date_input("Start date", datetime.date.today() - datetime.timedelta(days=1))
-end_date = st.date_input("End date", datetime.date.today())
+# start_date = st.date_input("Start date", datetime.date.today() - datetime.timedelta(days=1))
+# end_date = st.date_input("End date", datetime.date.today())
 
 query_mv = f"""
 SELECT
@@ -47,7 +47,7 @@ SELECT
     round(avgMerge(avg_temperature_state),2) AS avg_temp,
     minMerge(min_temperature_state) AS min_temp,
     maxMerge(max_temperature_state) AS max_temp
-FROM trend_table
+FROM trend_table_del
 WHERE city = '{city}'
 GROUP BY city, StartHour
 ORDER BY StartHour
