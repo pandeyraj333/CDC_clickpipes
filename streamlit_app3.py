@@ -22,7 +22,7 @@ client = clickhouse_connect.get_client(
 query_city = f"""
 SELECT
     city,
-FROM trend_table_del
+FROM trend_table_del2
 GROUP BY city
 """
 
@@ -47,7 +47,7 @@ SELECT
     round(avgMerge(avg_temperature_state),2) AS avg_temp,
     minMerge(min_temperature_state) AS min_temp,
     maxMerge(max_temperature_state) AS max_temp
-FROM trend_table_del
+FROM trend_table_del2
 WHERE city = '{city}'
 GROUP BY city, StartHour
 ORDER BY StartHour
@@ -70,6 +70,8 @@ st.subheader("🌡️ Latest Live Weather Snapshot")
 today = datetime.date.today()
 selected_date = st.date_input("Select a date", today)
 
+selected_date_str = selected_date.strftime("%Y-%m-%d")
+
 query_latest = f"""
 SELECT
     city,
@@ -78,7 +80,7 @@ SELECT
     weather_description,
     toTimeZone(parseDateTimeBestEffort(timestamp), 'Asia/Kolkata') AS ist_time
 FROM live_weather_db_weather_data
-WHERE city = '{city}', ist_time <= parseDateTimeBestEffort('{selected_date}')
+WHERE city = '{city}' and ist_time <= parseDateTimeBestEffort('{selected_date_str}')
 ORDER BY parseDateTimeBestEffort(timestamp) DESC
 LIMIT 1
 """
