@@ -4,11 +4,14 @@ import clickhouse_connect
 import time
 import datetime
 
+
 # ⏱️ Auto-refresh every 2 minutes
 st.query_params.update(update=int(time.time() // 120))
 
 st.title("🌤️ Weather Dashboard (Live, IST)")
 st.caption("Powered by MySQL → ClickPipes → ClickHouse → Streamlit")
+
+st.subheader("🌡️ Latest Live Weather Snapshot")
 
 # 🔐 Secure credentials
 client = clickhouse_connect.get_client(
@@ -18,6 +21,54 @@ client = clickhouse_connect.get_client(
     secure=True,
     database='MySQL-CDC'  # Adjust if your DB name differs
 )
+
+query_city = f"""
+SELECT
+    city,
+    FROM (
+        SELECT city, parseDateTimeBestEffort(timestamp) AS parsed_timestamp, argMax(_peerdb_is_deleted, _peerdb_synced_at) AS latest_deleted from live_weather_db_weather_data group by city, parsed_timestamp
+        )
+    where latest_deleted = 0
+    GROUP BY city
+"""
+
+result_live = client.query(query_city)
+df_city_live = pd.DataFrame(result_live.result_rows, columns=result_live.column_names)
+unique_values_live = df_city_live['city'].unique()
+city_live = st.selectbox("Choose a value:", unique_values_live, key = 'live')
+
+today = datetime.date.today()
+selected_date = st.date_input("Select a date", today)
+
+selected_date_str = selected_date.strftime("%Y-%m-%d")
+
+query_latest = f"""
+SELECT
+    city,
+    temperature,
+    humidity,
+    weather_description,
+    toTimeZone(parseDateTimeBestEffort(timestamp), 'Asia/Kolkata') AS ist_time
+FROM live_weather_db_weather_data
+WHERE city = '{city_live}' and ist_time <= addDays(parseDateTimeBestEffort('{selected_date_str}'),1)
+ORDER BY parseDateTimeBestEffort(timestamp) DESC
+LIMIT 1
+"""
+
+latest = client.query(query_latest)
+latest_df = pd.DataFrame(latest.result_rows, columns=latest.column_names)
+
+if not latest_df.empty:
+    row = latest_df.iloc[0]
+    st.metric(label="Temperature (°C)", value=f"{row['temperature']}°")
+    st.metric(label="Humidity (%)", value=f"{row['humidity']}%")
+    st.write(f"**Description:** {row['weather_description']}")
+    st.write(f"**Updated at:** {row['ist_time']} IST")
+else:
+    st.warning("No latest weather data found.")
+
+
+#===================================================================================
 
 query_city = f"""
 SELECT
@@ -65,49 +116,4 @@ else:
     st.warning("No data found in this time range.")
 
 # 🔹 Visual 2: Latest Snapshot
-st.subheader("🌡️ Latest Live Weather Snapshot")
 
-query_city = f"""
-SELECT
-    city,
-    FROM (
-        SELECT city, parseDateTimeBestEffort(timestamp) AS parsed_timestamp, argMax(_peerdb_is_deleted, _peerdb_synced_at) AS latest_deleted from live_weather_db_weather_data group by city, parsed_timestamp
-        )
-    where latest_deleted = 0
-    GROUP BY city
-"""
-
-result_live = client.query(query_city)
-df_city_live = pd.DataFrame(result_live.result_rows, columns=result_live.column_names)
-unique_values_live = df_city_live['city'].unique()
-city_live = st.selectbox("Choose a value:", unique_values_live, key = 'live')
-
-today = datetime.date.today()
-selected_date = st.date_input("Select a date", today)
-
-selected_date_str = selected_date.strftime("%Y-%m-%d")
-
-query_latest = f"""
-SELECT
-    city,
-    temperature,
-    humidity,
-    weather_description,
-    toTimeZone(parseDateTimeBestEffort(timestamp), 'Asia/Kolkata') AS ist_time
-FROM live_weather_db_weather_data
-WHERE city = '{city_live}' and ist_time <= parseDateTimeBestEffort('{selected_date_str}')
-ORDER BY parseDateTimeBestEffort(timestamp) DESC
-LIMIT 1
-"""
-
-latest = client.query(query_latest)
-latest_df = pd.DataFrame(latest.result_rows, columns=latest.column_names)
-
-if not latest_df.empty:
-    row = latest_df.iloc[0]
-    st.metric(label="Temperature (°C)", value=f"{row['temperature']}°")
-    st.metric(label="Humidity (%)", value=f"{row['humidity']}%")
-    st.write(f"**Description:** {row['weather_description']}")
-    st.write(f"**Updated at:** {row['ist_time']} IST")
-else:
-    st.warning("No latest weather data found.")
