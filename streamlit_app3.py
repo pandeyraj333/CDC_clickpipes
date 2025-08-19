@@ -50,7 +50,7 @@ SELECT
     weather_description,
     toTimeZone(parseDateTimeBestEffort(timestamp), 'Asia/Kolkata') AS ist_time
 FROM live_weather_db_weather_data
-WHERE city = 'Chandigarh' and _peerdb_is_deleted =0
+WHERE city = '{city_live}' and _peerdb_is_deleted =0
 ORDER BY parseDateTimeBestEffort(timestamp) DESC
 LIMIT 1
 """
