@@ -29,7 +29,7 @@ GROUP BY city
 result = client.query(query_city)
 df_city = pd.DataFrame(result.result_rows, columns=result.column_names)
 unique_values = df_city['city'].unique()
-city = st.selectbox("Choose a value:", unique_values_live, key = 'aggregation')
+city = st.selectbox("Choose a value:", unique_values, key = 'aggregation')
 
 st.write(f"You selected: {city}")
 
