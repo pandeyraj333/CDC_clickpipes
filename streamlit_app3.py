@@ -29,7 +29,7 @@ GROUP BY city
 result = client.query(query_city)
 df_city = pd.DataFrame(result.result_rows, columns=result.column_names)
 unique_values = df_city['city'].unique()
-city = st.selectbox("Choose a value:", unique_values)
+city = st.selectbox("Choose a value:", unique_values, key = 'aggregation')
 
 st.write(f"You selected: {city}")
 
@@ -80,7 +80,7 @@ GROUP BY city
 result = client.query(query_city)
 df_city_live = pd.DataFrame(result.result_rows, columns=result.column_names)
 unique_values_live = df_city['city'].unique()
-city_live = st.selectbox("Choose a value:", unique_values)
+city_live = st.selectbox("Choose a value:", unique_values, 'live')
 
 today = datetime.date.today()
 selected_date = st.date_input("Select a date", today)
