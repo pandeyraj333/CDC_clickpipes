@@ -67,6 +67,9 @@ else:
 # 🔹 Visual 2: Latest Snapshot
 st.subheader("🌡️ Latest Live Weather Snapshot")
 
+today = datetime.date.today()
+selected_date = st.date_input("Select a date", today)
+
 query_latest = f"""
 SELECT
     city,
@@ -75,7 +78,7 @@ SELECT
     weather_description,
     toTimeZone(parseDateTimeBestEffort(timestamp), 'Asia/Kolkata') AS ist_time
 FROM live_weather_db_weather_data
-WHERE city = '{city}'
+WHERE city = '{city}', ist_time <= parseDateTimeBestEffort('{selected_date}')
 ORDER BY parseDateTimeBestEffort(timestamp) DESC
 LIMIT 1
 """
