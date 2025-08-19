@@ -70,7 +70,7 @@ st.subheader("🌡️ Latest Live Weather Snapshot")
 query_city = f"""
 SELECT
     city,
-FROM trend_table_del2 where _peerdb_is_deleted
+FROM live_weather_db_weather_data where _peerdb_is_deleted
 GROUP BY city
 """
 
