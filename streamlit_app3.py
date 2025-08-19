@@ -74,7 +74,7 @@ SELECT
         SELECT city, parseDateTimeBestEffort(timestamp) AS parsed_timestamp, argMax(_peerdb_is_deleted, _peerdb_synced_at) AS latest_deleted from live_weather_db_weather_data group by city, parsed_timestamp
         )
     where latest_deleted = 0
-    GROUP BY city;
+    GROUP BY city
 """
 
 result = client.query(query_city)
