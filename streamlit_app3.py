@@ -78,9 +78,9 @@ GROUP BY city
 """
 
 result = client.query(query_city)
-df_city = pd.DataFrame(result.result_rows, columns=result.column_names)
-unique_values = df_city['city'].unique()
-city = st.selectbox("Choose a value:", unique_values)
+df_city_live = pd.DataFrame(result.result_rows, columns=result.column_names)
+unique_values_live = df_city['city'].unique()
+city_live = st.selectbox("Choose a value:", unique_values)
 
 today = datetime.date.today()
 selected_date = st.date_input("Select a date", today)
@@ -95,7 +95,7 @@ SELECT
     weather_description,
     toTimeZone(parseDateTimeBestEffort(timestamp), 'Asia/Kolkata') AS ist_time
 FROM live_weather_db_weather_data
-WHERE city = '{city}' and ist_time <= parseDateTimeBestEffort('{selected_date_str}')
+WHERE city = '{city_live}' and ist_time <= parseDateTimeBestEffort('{selected_date_str}')
 ORDER BY parseDateTimeBestEffort(timestamp) DESC
 LIMIT 1
 """
