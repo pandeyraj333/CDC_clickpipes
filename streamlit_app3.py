@@ -26,9 +26,9 @@ FROM trend_table_del2
 GROUP BY city
 """
 
-result_live = client.query(query_city)
-df_city_live = pd.DataFrame(result_live.result_rows, columns=result_live.column_names)
-unique_values_live = df_city_live['city'].unique()
+result = client.query(query_city)
+df_city = pd.DataFrame(result.result_rows, columns=result.column_names)
+unique_values = df_city['city'].unique()
 city = st.selectbox("Choose a value:", unique_values_live, key = 'aggregation')
 
 st.write(f"You selected: {city}")
@@ -77,10 +77,10 @@ SELECT
     GROUP BY city
 """
 
-result = client.query(query_city)
-df_city_live = pd.DataFrame(result.result_rows, columns=result.column_names)
-unique_values_live = df_city['city'].unique()
-city_live = st.selectbox("Choose a value:", unique_values, key = 'live')
+result_live = client.query(query_city)
+df_city_live = pd.DataFrame(result_live.result_rows, columns=result_live.column_names)
+unique_values_live = df_city_live['city'].unique()
+city_live = st.selectbox("Choose a value:", unique_values_live, key = 'live')
 
 today = datetime.date.today()
 selected_date = st.date_input("Select a date", today)
