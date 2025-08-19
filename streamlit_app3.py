@@ -1,4 +1,4 @@
-import streamlit as st
+ =import streamlit as st
 import pandas as pd
 import clickhouse_connect
 import time
@@ -80,7 +80,7 @@ GROUP BY city
 result = client.query(query_city)
 df_city_live = pd.DataFrame(result.result_rows, columns=result.column_names)
 unique_values_live = df_city['city'].unique()
-city_live = st.selectbox("Choose a value:", unique_values, 'live')
+city_live = st.selectbox("Choose a value:", unique_values, key = 'live')
 
 today = datetime.date.today()
 selected_date = st.date_input("Select a date", today)
